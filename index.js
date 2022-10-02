@@ -77,18 +77,22 @@ async function swap() {
         web3.utils.fromWei(amountOutMin),
         "Token"
       );
-      const tx = await pancakeRouter.methods
-        .swapExactETHForTokens(
-          amountOutMin,
-          [WBNB, IDO_TOKEN_ADDRESS],
-          accounts[i],
-          parseInt(Date.now() / 1000) + 600
-        )
-        .send({ from: accounts[i], gas: 500000, value: AMOUNTS[i] });
-      console.log("Tx swap", tx.transactionHash);
+      swapExactETHForTokens(AMOUNTS[i], amountOutMin, IDO_TOKEN_ADDRESS);
     }
   } catch (err) {
     console.log(err);
     swap();
   }
+}
+
+async function swapExactETHForTokens(amountIn, amountOut, token) {
+  const tx = await pancakeRouter.methods
+    .swapExactETHForTokens(
+      amountOut,
+      [WBNB, token],
+      accounts[i],
+      parseInt(Date.now() / 1000) + 600
+    )
+    .send({ from: accounts[i], gas: 500000, value: amountIn });
+  console.log("Tx swap", tx.transactionHash);
 }
