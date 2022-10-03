@@ -58,46 +58,45 @@ async function start() {
 }
 
 async function swap() {
-  try {
-    for (i = 0; i < accounts.length; i++) {
-      const amountOut = (
-        await pancakeRouter.methods
-          .getAmountsOut(AMOUNTS[i], [WBNB, IDO_TOKEN_ADDRESS])
-          .call()
-      )[1];
-      const amountOutMin = (
-        amountOut -
-        (amountOut * SLIPPAGE) / 100
-      ).toLocaleString("fullwide", {
-        useGrouping: false,
-      });
-      console.log(
-        "Swap exact " + web3.utils.fromWei(AMOUNTS[i]),
-        "BNB to minimum ",
-        web3.utils.fromWei(amountOutMin),
-        "Token"
-      );
-      try {
-        swapExactETHForTokens(AMOUNTS[i], amountOutMin, IDO_TOKEN_ADDRESS);
-      } catch (err) {
-        console.log(err);
-        swapExactETHForTokens(AMOUNTS[i], amountOutMin, IDO_TOKEN_ADDRESS);
-      }
+  for (i = 0; i < accounts.length; i++) {
+    try {
+      singleSwap(accounts[i], AMOUNTS[i]);
+    } catch (e) {
+      console.log(e);
+      singleSwap(accounts[i], AMOUNTS[i]);
     }
-  } catch (err) {
-    console.log(err);
-    swap();
   }
 }
 
-async function swapExactETHForTokens(amountIn, amountOut, token) {
+async function singleSwap(account, amountIn) {
+  const amountOut = (
+    await pancakeRouter.methods
+      .getAmountsOut(amountIn, [WBNB, IDO_TOKEN_ADDRESS])
+      .call()
+  )[1];
+  const amountOutMin = (
+    amountOut -
+    (amountOut * SLIPPAGE) / 100
+  ).toLocaleString("fullwide", {
+    useGrouping: false,
+  });
+  console.log(
+    "Swap exact " + web3.utils.fromWei(amountIn),
+    "BNB to minimum ",
+    web3.utils.fromWei(amountOutMin),
+    "Token"
+  );
+  swapExactETHForTokens(account, amountIn, amountOutMin, IDO_TOKEN_ADDRESS);
+}
+
+async function swapExactETHForTokens(account, amountIn, amountOut, token) {
   const tx = await pancakeRouter.methods
     .swapExactETHForTokens(
       amountOut,
       [WBNB, token],
-      accounts[i],
+      account,
       parseInt(Date.now() / 1000) + 600
     )
-    .send({ from: accounts[i], gas: 500000, value: amountIn });
+    .send({ from: account, gas: 500000, value: amountIn });
   console.log("Tx swap", tx.transactionHash);
 }
