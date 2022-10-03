@@ -81,6 +81,7 @@ async function swap() {
         swapExactETHForTokens(AMOUNTS[i], amountOutMin, IDO_TOKEN_ADDRESS);
       } catch (err) {
         console.log(err);
+        swapExactETHForTokens(AMOUNTS[i], amountOutMin, IDO_TOKEN_ADDRESS);
       }
     }
   } catch (err) {
