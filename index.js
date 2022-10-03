@@ -77,7 +77,11 @@ async function swap() {
         web3.utils.fromWei(amountOutMin),
         "Token"
       );
-      swapExactETHForTokens(AMOUNTS[i], amountOutMin, IDO_TOKEN_ADDRESS);
+      try {
+        swapExactETHForTokens(AMOUNTS[i], amountOutMin, IDO_TOKEN_ADDRESS);
+      } catch (err) {
+        console.log(err);
+      }
     }
   } catch (err) {
     console.log(err);
